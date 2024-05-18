@@ -36,7 +36,7 @@ def request_api(document_date: datetime, mock: bool = False) -> str | bytes:
     return response.content
 
 class APIRespoonse(BaseModel):
-    colums: list[str] = Field(validation_alias='Columns')
+    columns: list[str] = Field(validation_alias='Columns')
     description: str = Field(validation_alias='Description')
     row_count: NonNegativeInt = Field(validation_alias='RowCount')
     rows: list[list[datetime | int | str]] = Field(validation_alias='Rows')
@@ -54,7 +54,7 @@ class APIRespoonse(BaseModel):
         if self.row_count != len(self.rows):
             raise ValueError('Rows amount differs from expected amount')
         for row in self.rows:
-            if len(row) != len(self.colums):
+            if len(row) != len(self.columns):
                 raise ValueError('Rows length differs from expected')
             if type(row[0]) is not int:
                 raise ValueError('Col 0 must be int type')
@@ -68,7 +68,7 @@ if __name__ == '__main__':
     document_date = datetime.now()
     response = request_api(document_date, mock=True)
     res = APIRespoonse.model_validate_json(response)
-    data = DataFrame(res.rows, columns=res.colums)
+    data = DataFrame(res.rows, columns=res.columns)
     data.rename(columns=RENAME_MAP, inplace=True)
     data.insert(len(data.columns), 'load_dt', [document_date] * len(data))
     print(data)
